@@ -23,10 +23,17 @@ def save_data(tasks):
 def add(name_task):
     task = Task(name_task)
     tasks = load_data()
+    max_id = int(max(tasks.keys(), default=0))
+    task.id = max_id + 1
     tasks[task.id] = task.to_dict()
     save_data(tasks)
-    print(f"Task added. ID: {task.id}")
+    print(f"Task \"{task.name}\" added. ID: {task.id}")
 
 
-add("Learn Python")
-add("Learn CLI")
+parse = argparse.ArgumentParser(description="Task CLI")
+sub = parse.add_subparsers(dest="command")
+add_parser = sub.add_parser("add", help="Add a new task")
+add_parser.add_argument("name_task", help="Name of the task")
+args = parse.parse_args()
+if args.command == "add":
+    add(args.name_task)
