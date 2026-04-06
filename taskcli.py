@@ -1,6 +1,7 @@
 import task
 import json
 import argparse
+from tabulate import tabulate
 
 from task import Task
 
@@ -11,7 +12,7 @@ def load_data():
         with open(file_path, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        print("Tasks file not found.")
+        return {}
 
 def save_data(tasks):
     try:
@@ -50,6 +51,14 @@ def update(task_id, new_name):
     else:
         print(f"Task with ID {task_id} not found.")
 
+def list_tasks():
+    tasks = load_data()
+    if tasks:
+        table = [[task_id, data['name'], data['created_at'], data['updated_at']] for task_id, data in tasks.items()]
+        print(tabulate(table, headers=["ID", "Name", "Created At", "Updated At"], tablefmt="grid"))
+    else:
+        print("No tasks found.")
+
 
 parse = argparse.ArgumentParser(description="Task CLI")
 sub = parse.add_subparsers(dest="command")
@@ -60,7 +69,7 @@ delete_parser.add_argument("task_id", help="ID of the task to delete")
 update_parser = sub.add_parser("update", help="Update a task")
 update_parser.add_argument("task_id", help="ID of the task to update")
 update_parser.add_argument("new_name", help="New name for the task")
-
+list_parser = sub.add_parser("list", help="List all tasks")
 args = parse.parse_args()
 if args.command == "add":
     add(args.name_task)
@@ -68,3 +77,9 @@ elif args.command == "delete":
     delete(args.task_id)
 elif args.command == "update":
     update(args.task_id, args.new_name)
+elif args.command == "list":
+    list_tasks()
+elif args.command == "list":
+    list_tasks()
+else:
+    print("Unknown command.")
